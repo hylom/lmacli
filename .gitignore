@@ -1,0 +1,7 @@
+config.ini
+.*
+*~
+venv
+*.egg-info
+assertion_key.json
+__pycache__

@@ -1,0 +1,5 @@
+[default]
+ChannelSecret = 
+ChannelAccessToken = 
+ChannelId = 
+AssertionKeyFile = assertion_key.json
