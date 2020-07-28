@@ -10,6 +10,7 @@ from lib.access_token import TokenInterface
 from lib.user import UserInterface
 from lib.push import PushInterface
 from lib.audience import AudienceInterface
+from lib.insight import InsightInterface
 
 def main():
     parser = argparse.ArgumentParser(description='LINE Message API CLI.')
@@ -21,8 +22,7 @@ def main():
     token_create = token_subparsers.add_parser('create')
     token_list = token_subparsers.add_parser('list')
     token_list.add_argument('--token',
-                            const=True,
-                            action='store_const',
+                            action='store_true',
                             help="get tokens instead of key id")
     token_revoke = token_subparsers.add_parser('revoke')
     token_revoke.add_argument('token',
@@ -30,6 +30,7 @@ def main():
 
     # `user' commands
     user = subparsers.add_parser('user')
+    user.add_argument('--hoge', help="hogehoge")
     user_subparsers = user.add_subparsers(dest='subcommand')
     user_profile = user_subparsers.add_parser('profile')
     user_profile.add_argument('user_id',
@@ -40,6 +41,9 @@ def main():
     push.add_argument('-m', '--message', nargs='*',
                       type=argparse.FileType('r'),
                       help="message json file to send")
+    push.add_argument('-t', '--text',
+                          action='append',
+                          help='text to send')
     push_subparsers = push.add_subparsers(dest='subcommand')
     push_msg = push_subparsers.add_parser('message')
     push_msg.add_argument('to',
@@ -69,7 +73,6 @@ def main():
     push_narrow.add_argument('-m', '--message', nargs='*',
                              type=argparse.FileType('r'),
                              help="message json file to send")
-
     push_broad = push_subparsers.add_parser('broadcast')
     push_broad.add_argument('-t', '--text',
                             action='append',
@@ -78,6 +81,16 @@ def main():
                             type=argparse.FileType('r'),
                             help="message json file to send")
 
+    # `insight' commands
+    insight = subparsers.add_parser('insight')
+    insight_subp = insight.add_subparsers(dest='subcommand')
+    insight_followers = insight_subp.add_parser('followers')
+    insight_followers.add_argument('date',
+                                   help='date (yyyyMMdd)')
+    insight_delivery = insight_subp.add_parser('delivery')
+    insight_delivery.add_argument('date',
+                                  help='date (yyyyMMdd)')
+    
     # `audience' commands
     aud = subparsers.add_parser('audience')
     aud_subparsers = aud.add_subparsers(dest='subcommand')
@@ -134,6 +147,16 @@ def main():
         aud = AudienceInterface(default_cfg)
         if args.subcommand == "list":
             resp = aud.list()
+            print(resp)
+            return
+    elif args.command == "insight":
+        insight = InsightInterface(default_cfg)
+        if args.subcommand == "followers":
+            resp = insight.followers(args.date)
+            print(resp)
+            return
+        if args.subcommand == "delivery":
+            resp = insight.delivery(args.date)
             print(resp)
             return
 
