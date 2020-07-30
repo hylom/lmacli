@@ -1,0 +1,23 @@
+{
+  "size": {
+    "width": 1000,
+    "height": 1000
+  },
+  "selected": true,
+  "name": "richmenu 03",
+  "chatBarText": "squared menu",
+  "areas": [
+    {
+      "bounds": {
+        "x": 0,
+        "y": 0,
+        "width": 1000,
+        "height": 1000
+      },
+      "action": {
+        "type": "postback",
+        "data": "tap_richmenu03"
+      }
+    }
+  ]
+}

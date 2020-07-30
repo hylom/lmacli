@@ -1,0 +1,23 @@
+{
+  "size": {
+    "width": 1000,
+    "height": 600
+  },
+  "selected": true,
+  "name": "anime menu",
+  "chatBarText": "anime menu",
+  "areas": [
+    {
+      "bounds": {
+        "x": 0,
+        "y": 0,
+        "width": 1000,
+        "height": 600
+      },
+      "action": {
+        "type": "postback",
+        "data": "tap_anime_menu"
+      }
+    }
+  ]
+}
