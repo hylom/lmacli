@@ -1,0 +1,29 @@
+{
+  "type": "flex",
+  "altText": "flex message example",
+  "contents": {
+    "type": "bubble",
+    "size": "giga",
+    "direction": "ltr",
+    "hero": {
+      "type": "image",
+      "url": "https://1.bp.blogspot.com/-B5M3bY2oTcM/XwkxYUf_QSI/AAAAAAABZ_c/WSZ8MuTszdA_aDBIhiA-4WAzl-gMrY3HgCNcBGAsYHQ/s600/bg_syutoken_gaikaku_housuiro.jpg",
+      "size": "full"
+    },
+    "body": {
+      "type": "box",
+      "layout": "vertical",
+      "contents": [
+        { "type": "text",
+          "text": "首都圏外郭放水路"
+        }
+      ]
+    },
+    "styles": {
+      "header": { "backgroundColor": "#E3CCA8"},
+      "hero": { "backgroundColor": "#E3D8A8"},
+      "body": { "backgroundColor": "#FAEBC6"},
+      "footer": { "backgroundColor": "#FDDBBB"}
+    }
+  }
+}
