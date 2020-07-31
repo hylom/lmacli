@@ -3,7 +3,7 @@
     "width": 1000,
     "height": 500
   },
-  "selected": true,
+  "selected": false,
   "name": "richmenu 02",
   "chatBarText": "your richmenu",
   "areas": [

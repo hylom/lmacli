@@ -4,7 +4,7 @@ import argparse
 import configparser
 import json
 
-from linebot.models import FlexSendMessage, TextSendMessage, LocationSendMessage
+import linebot.models
 
 from lib.access_token import TokenInterface
 from lib.user import UserInterface
@@ -173,7 +173,7 @@ def main():
         push = PushInterface(default_cfg)
         msgs = []
         if args.text:
-            msgs = [TextSendMessage(text=t) for t in args.text]
+            msgs = [linebot.models.TextSendMessage(text=t) for t in args.text]
         msgs += _create_message_object([json.load(fp) for fp in args.message])
         [fp.close() for fp in args.message]
         if args.subcommand == "message":
@@ -245,10 +245,15 @@ def _create_message_object(messages=[]):
     for msg in messages:
         m = None
         if msg["type"] == "flex":
-            m = FlexSendMessage(alt_text=msg["altText"],
-                                contents=msg["contents"])
+            m = linebot.models.FlexSendMessage(alt_text=msg["altText"],
+                                               contents=msg["contents"])
         if msg["type"] == "location":
-            m = LocationSendMessage.new_from_json_dict(msg)
+            m = linebot.models.LocationSendMessage.new_from_json_dict(msg)
+        if msg["type"] == "sticker":
+            m = linebot.models.StickerSendMessage.new_from_json_dict(msg)
+        if msg["type"] == "image":
+            m = linebot.models.ImageSendMessage.new_from_json_dict(msg)
+
         if m:
             result.append(m)
     return result
