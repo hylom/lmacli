@@ -5,7 +5,7 @@ This is Command-Line Client (CLI) to use LINE messaging API.
 LINE messaging API is:
 https://developers.line.biz/en/docs/messaging-api/
 
- * warning: THIS IS NOT AN OFFICIAL LINE PRODUCT! *
+ **warning: THIS IS NOT AN OFFICIAL LINE PRODUCT!**
 
 ## Requirement
 
@@ -17,23 +17,26 @@ https://developers.line.biz/en/docs/messaging-api/
 
 1. create venv and install dependencies.
 
+```bash
 $ python3 -m venv venv
 $ pip3 install -e .
+```
 
 2. copy `config.ini.sample' to `config.ini' and edit.
 
+```ini
 [default]
 ChannelSecret = ...
 ChannelAccessToken = ...
 ChannelId = ...
 AssertionKeyFile = assertion_key.json
+```
 
 2-1. prepare assertion signing key if use from LINE Developers site (optional)
 
 3. check command line help
 
-./bin/cli -h
-
+```shell
 $ ./bin/cli -h
 usage: cli [-h] {token,user,push,insight,audience,richmenu} ...
 
@@ -44,7 +47,9 @@ positional arguments:
 
 optional arguments:
   -h, --help            show this help message and exit
+```
 
+```
 $ ./bin/cli push -h
 usage: cli push [-h] [-m [MESSAGE [MESSAGE ...]]] [-t TEXT] {message,multicast,narrowcast,broadcast} ...
 
@@ -56,6 +61,7 @@ optional arguments:
   -m [MESSAGE [MESSAGE ...]], --message [MESSAGE [MESSAGE ...]]
                         message json file to send
   -t TEXT, --text TEXT  text to send
+```
 
 ## License
 
