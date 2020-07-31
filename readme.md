@@ -22,7 +22,7 @@ $ python3 -m venv venv
 $ pip3 install -e .
 ```
 
-2. copy `config.ini.sample' to `config.ini' and edit.
+2. copy `config.ini.sample` to `config.ini` and edit.
 
 ```ini
 [default]
@@ -32,9 +32,9 @@ ChannelId = ...
 AssertionKeyFile = assertion_key.json
 ```
 
-2-1. prepare assertion signing key if use from LINE Developers site (optional)
+3. prepare assertion signing key if use from LINE Developers site (optional)
 
-3. check command line help
+4. check command line help
 
 ```shell
 $ ./bin/cli -h
