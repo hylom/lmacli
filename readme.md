@@ -19,7 +19,8 @@ https://developers.line.biz/en/docs/messaging-api/
 
 ```bash
 $ python3 -m venv venv
-$ pip3 install -e .
+$ . venv/bin/activate
+(venv) $ pip3 install -e .
 ```
 
 2. copy `config.ini.sample` to `config.ini` and edit.
