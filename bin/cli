@@ -4,7 +4,7 @@ import argparse
 import configparser
 import json
 
-from linebot.models import FlexSendMessage, TextSendMessage
+from linebot.models import FlexSendMessage, TextSendMessage, LocationSendMessage
 
 from lib.access_token import TokenInterface
 from lib.user import UserInterface
@@ -52,8 +52,9 @@ def main():
     push_msg.add_argument('-t', '--text',
                           action='append',
                           help='text to send')
-    push_msg.add_argument('-m', '--message', nargs='*',
+    push_msg.add_argument('-m', '--message',
                           type=argparse.FileType('r'),
+                          action='append',
                           help="message json file to send")
     push_multi = push_subparsers.add_parser('multicast')
     push_multi.add_argument('to',
@@ -242,9 +243,13 @@ def main():
 def _create_message_object(messages=[]):
     result = []
     for msg in messages:
+        m = None
         if msg["type"] == "flex":
             m = FlexSendMessage(alt_text=msg["altText"],
                                 contents=msg["contents"])
+        if msg["type"] == "location":
+            m = LocationSendMessage.new_from_json_dict(msg)
+        if m:
             result.append(m)
     return result
 
