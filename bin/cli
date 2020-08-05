@@ -174,8 +174,9 @@ def main():
         msgs = []
         if args.text:
             msgs = [linebot.models.TextSendMessage(text=t) for t in args.text]
-        msgs += _create_message_object([json.load(fp) for fp in args.message])
-        [fp.close() for fp in args.message]
+        if args.message:
+            msgs += _create_message_object([json.load(fp) for fp in args.message])
+            [fp.close() for fp in args.message]
         if args.subcommand == "message":
             push.message(args.to, msgs)
             return
