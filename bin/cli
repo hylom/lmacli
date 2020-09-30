@@ -7,6 +7,7 @@ import json
 import linebot.models
 
 from lib.access_token import TokenInterface
+from lib.access_token_20 import Token20Interface
 from lib.user import UserInterface
 from lib.push import PushInterface
 from lib.audience import AudienceInterface
@@ -25,6 +26,14 @@ def main():
     token_list.add_argument('--token',
                             action='store_true',
                             help="get tokens instead of key id")
+    token_revoke = token_subparsers.add_parser('revoke')
+    token_revoke.add_argument('token',
+                              help="access token")
+
+    # `token20' commands
+    token = subparsers.add_parser('token20')
+    token_subparsers = token.add_subparsers(dest='subcommand')
+    token_create = token_subparsers.add_parser('create')
     token_revoke = token_subparsers.add_parser('revoke')
     token_revoke.add_argument('token',
                               help="access token")
@@ -163,6 +172,16 @@ def main():
             resp = token.revoke(args.token)
             print(resp)
             return
+    elif args.command == "token20":
+        token = Token20Interface(default_cfg)
+        if args.subcommand == "create":
+            resp = token.create()
+            print(resp)
+            return
+        elif args.subcommand == "revoke":
+            resp = token.revoke(args.token)
+            print(resp)
+            return
     elif args.command == "user":
         user = UserInterface(default_cfg)
         if args.subcommand == "profile":
@@ -254,6 +273,8 @@ def _create_message_object(messages=[]):
             m = linebot.models.StickerSendMessage.new_from_json_dict(msg)
         if msg["type"] == "image":
             m = linebot.models.ImageSendMessage.new_from_json_dict(msg)
+        if msg["type"] == "template":
+            m = linebot.models.TemplateSendMessage.new_from_json_dict(msg)
 
         if m:
             result.append(m)
