@@ -5,7 +5,7 @@ import configparser
 import json
 
 import linebot.models
-
+from lib.shim import TextSendMessage
 from lib.access_token import TokenInterface
 from lib.access_token_20 import Token20Interface
 from lib.user import UserInterface
@@ -275,6 +275,10 @@ def _create_message_object(messages=[]):
             m = linebot.models.ImageSendMessage.new_from_json_dict(msg)
         if msg["type"] == "template":
             m = linebot.models.TemplateSendMessage.new_from_json_dict(msg)
+        if msg["type"] == "text":
+            m = TextSendMessage.new_from_json_dict(msg)
+            print(m)
+                                               
 
         if m:
             result.append(m)
