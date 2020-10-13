@@ -23,6 +23,10 @@ class Token20Interface(Interface):
             resp = self.create()
             print(resp)
             return
+        elif args.subcommand == "verify":
+            resp = self.verify(args.token)
+            print(resp)
+            return
         elif args.subcommand == "revoke":
             resp = self.revoke(args.token)
             print(resp)
@@ -51,6 +55,28 @@ class Token20Interface(Interface):
 
         return json.loads(resp.read().decode('utf-8'))
 
+    def verify(self, token):
+        config = self.get_config()
+        API_URL = "https://api.line.me/v2/oauth/verify"
+        headers = { "Content-Type": "application/x-www-form-urlencoded" }
+        config = self.get_config()
+        data = {
+            "access_token": token,
+        }
+        req = request.Request(API_URL,
+                              data=parse.urlencode(data).encode("ascii"),
+                              headers=headers,
+                              method="POST")
+        try:
+            resp = request.urlopen(req)
+            return json.loads(resp.read().decode('utf-8'))
+        except HTTPError as e:
+            if (e.code == 400):
+                return json.loads(e.read().decode('utf-8'))
+            return e
+
+        return
+
     def revoke(self, token):
         config = self.get_config()
         API_URL = "https://api.line.me/v2/oauth/revoke"
@@ -64,6 +90,7 @@ class Token20Interface(Interface):
                               method="POST")
         try:
             resp = request.urlopen(req)
+            return json.loads(resp.read().decode('utf-8'))
         except HTTPError as e:
             if (e.code == 400):
                 return json.loads(e.read().decode('utf-8'))
