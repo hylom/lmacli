@@ -5,7 +5,7 @@ import configparser
 import json
 
 import linebot.models
-from lib.shim import TextSendMessage
+
 from lib.access_token import TokenInterface
 from lib.access_token_20 import Token20Interface
 from lib.user import UserInterface
@@ -15,274 +15,36 @@ from lib.insight import InsightInterface
 from lib.rich_menu import RichMenuInterface
 
 def main():
-    parser = argparse.ArgumentParser(description='LINE Message API CLI.')
-    subparsers = parser.add_subparsers(dest="command", required=True)
-
-    # `token' commands
-    token = subparsers.add_parser('token')
-    token_subparsers = token.add_subparsers(dest='subcommand')
-    token_create = token_subparsers.add_parser('create')
-    token_list = token_subparsers.add_parser('list')
-    token_list.add_argument('--token',
-                            action='store_true',
-                            help="get tokens instead of key id")
-    token_revoke = token_subparsers.add_parser('revoke')
-    token_revoke.add_argument('token',
-                              help="access token")
-
-    # `token20' commands
-    token = subparsers.add_parser('token20')
-    token_subparsers = token.add_subparsers(dest='subcommand')
-    token_create = token_subparsers.add_parser('create')
-    token_revoke = token_subparsers.add_parser('revoke')
-    token_revoke.add_argument('token',
-                              help="access token")
-
-    # `user' commands
-    user = subparsers.add_parser('user')
-    user.add_argument('--hoge', help="hogehoge")
-    user_subparsers = user.add_subparsers(dest='subcommand')
-    user_profile = user_subparsers.add_parser('profile')
-    user_profile.add_argument('user_id',
-                              help="user ID")
-
-    # 'push` commands
-    push = subparsers.add_parser('push')
-    push.add_argument('-m', '--message', nargs='*',
-                      type=argparse.FileType('r'),
-                      help="message json file to send")
-    push.add_argument('-t', '--text',
-                          action='append',
-                          help='text to send')
-    push_subparsers = push.add_subparsers(dest='subcommand')
-    push_msg = push_subparsers.add_parser('message')
-    push_msg.add_argument('to',
-                          help='ID to send message')
-    push_msg.add_argument('-t', '--text',
-                          action='append',
-                          help='text to send')
-    push_msg.add_argument('-m', '--message',
-                          type=argparse.FileType('r'),
-                          action='append',
-                          help="message json file to send")
-    push_multi = push_subparsers.add_parser('multicast')
-    push_multi.add_argument('to',
-                            nargs='+',
-                            help='IDs to send message')
-    push_multi.add_argument('-t', '--text',
-                            action='append',
-                            help='text to send')
-    push_multi.add_argument('-m', '--message', nargs='*',
-                            type=argparse.FileType('r'),
-                            help="message json file to send")
-    push_narrow = push_subparsers.add_parser('narrowcast')
-    push_narrow.add_argument('to',
-                             help='group ID to send message')
-    push_narrow.add_argument('-t', '--text',
-                             action='append',
-                             help='text to send')
-    push_narrow.add_argument('-m', '--message', nargs='*',
-                             type=argparse.FileType('r'),
-                             help="message json file to send")
-    push_broad = push_subparsers.add_parser('broadcast')
-    push_broad.add_argument('-t', '--text',
-                            action='append',
-                            help='text to send')
-    push_broad.add_argument('-m', '--message', nargs='*',
-                            type=argparse.FileType('r'),
-                            help="message json file to send")
-
-    # `insight' commands
-    insight = subparsers.add_parser('insight')
-    insight_subp = insight.add_subparsers(dest='subcommand')
-    insight_followers = insight_subp.add_parser('followers')
-    insight_followers.add_argument('date',
-                                   help='date (yyyyMMdd)')
-    insight_delivery = insight_subp.add_parser('delivery')
-    insight_delivery.add_argument('date',
-                                  help='date (yyyyMMdd)')
-    
-    # `audience' commands
-    aud = subparsers.add_parser('audience')
-    aud_subparsers = aud.add_subparsers(dest='subcommand')
-    aud_list = aud_subparsers.add_parser('list')
-
-    # `richmenu' commands
-    menu = subparsers.add_parser('richmenu')
-    menu_subp = menu.add_subparsers(dest='subcommand')
-    menu_create = menu_subp.add_parser('create')
-    menu_create.add_argument('menu',
-                             metavar='JSON_FILE',
-                             type=argparse.FileType('r'),
-                             help='JSON file to describe menu structure')
-    menu_create.add_argument('-i', '--image',
-                             metavar='IMAGE_FILE',
-                             type=argparse.FileType('rb'),
-                             help='image file to upload')
-    menu_create.add_argument('--content-type',
-                             help='content-type of image')
-    menu_list = menu_subp.add_parser('list')
-    menu_delete = menu_subp.add_parser('delete')
-    menu_delete.add_argument('menu_id',
-                             help='rich menu ID to delete')
-    menu_default = menu_subp.add_parser('setdefault')
-    menu_default.add_argument('menu_id',
-                             help='rich menu ID to delete')
-    menu_link = menu_subp.add_parser('link')
-    menu_link.add_argument('user_id',
-                             help='user ID to attach rich menu')
-    menu_link.add_argument('menu_id',
-                             help='rich menu ID')
-    menu_unlink = menu_subp.add_parser('unlink')
-    menu_unlink.add_argument('user_id',
-                             help='user ID to attach rich menu')
-    menu_image = menu_subp.add_parser('image')
-    menu_image_subp = menu_image.add_subparsers(dest='action')
-    menu_image_upload = menu_image_subp.add_parser('upload')
-    menu_image_upload.add_argument('rich_menu_id',
-                                   metavar='rich-menu-id',
-                                   help='rich menu id')
-    menu_image_upload.add_argument('image',
-                                   metavar='IMAGE_FILE',
-                                   type=argparse.FileType('rb'),
-                                   help='image file to upload')
-    menu_image_upload.add_argument('--content-type',
-                                   help='content-type of image')
-                                   
-    # do parsing
-    args = parser.parse_args()
+    # read config
     cfg = configparser.ConfigParser()
     cfg.read("config.ini")
     default_cfg = cfg["default"]
 
-    if args.command == "token":
-        token = TokenInterface(default_cfg)
-        if args.subcommand == "list":
-            if args.token:
-                resp = token.list_tokens()
-            else:
-                resp = token.list()
-            print(resp)
-            return
-        elif args.subcommand == "create":
-            resp = token.create()
-            print(resp)
-            return
-        elif args.subcommand == "revoke":
-            resp = token.revoke(args.token)
-            print(resp)
-            return
-    elif args.command == "token20":
-        token = Token20Interface(default_cfg)
-        if args.subcommand == "create":
-            resp = token.create()
-            print(resp)
-            return
-        elif args.subcommand == "revoke":
-            resp = token.revoke(args.token)
-            print(resp)
-            return
-    elif args.command == "user":
-        user = UserInterface(default_cfg)
-        if args.subcommand == "profile":
-            resp = user.get_profile(args.user_id)
-            print(resp)
-            return
-    elif args.command == "push":
-        push = PushInterface(default_cfg)
-        msgs = []
-        if args.text:
-            msgs = [linebot.models.TextSendMessage(text=t) for t in args.text]
-        if args.message:
-            msgs += _create_message_object([json.load(fp) for fp in args.message])
-            [fp.close() for fp in args.message]
-        if args.subcommand == "message":
-            push.message(args.to, msgs)
-            return
-        elif args.subcommand == 'multicast':
-            push.multicast(args.to, msgs)
-            return
-        elif args.subcommand == 'narrowcast':
-            push.narrowcast(args.to, msgs)
-            return
-        elif args.subcommand == 'broadcast':
-            push.broadcast(args.text, msgs)
-            return
-    elif args.command == "audience":
-        aud = AudienceInterface(default_cfg)
-        if args.subcommand == "list":
-            resp = aud.list()
-            print(resp)
-            return
-    elif args.command == "insight":
-        insight = InsightInterface(default_cfg)
-        if args.subcommand == "followers":
-            resp = insight.followers(args.date)
-            print(resp)
-            return
-        if args.subcommand == "delivery":
-            resp = insight.delivery(args.date)
-            print(resp)
-            return
-    elif args.command == 'richmenu':
-        menu = RichMenuInterface(default_cfg)
-        if args.subcommand == 'create':
-            menu_data = json.load(args.menu)
-            args.menu.close()
-            resp = menu.create(menu_data, args.image)
-            print(resp)
-            return
-        elif args.subcommand == 'list':
-            resp = menu.list()
-            print(resp)
-            return
-        elif args.subcommand == 'delete':
-            resp = menu.delete(args.menu_id)
-            print(resp)
-            return
-        elif args.subcommand == 'link':
-            resp = menu.link(args.user_id, args.menu_id)
-            print(resp)
-            return
-        elif args.subcommand == 'unlink':
-            resp = menu.unlink(args.user_id)
-            print(resp)
-            return
-        elif args.subcommand == 'setdefault':
-            resp = menu.set_default(args.menu_id)
-            print(resp)
-            return
-        elif args.subcommand == 'image':
-            if args.action == 'upload':
-                resp = menu.upload_image(args.rich_menu_id,
-                                         args.image)
-                print(resp)
-                return
-            
+    # add subparsers
+    parser = argparse.ArgumentParser(description='LINE Message API CLI.')
+    subparsers = parser.add_subparsers(dest="command", required=True)
 
-def _create_message_object(messages=[]):
-    result = []
-    for msg in messages:
-        m = None
-        if msg["type"] == "flex":
-            m = linebot.models.FlexSendMessage(alt_text=msg["altText"],
-                                               contents=msg["contents"])
-        if msg["type"] == "location":
-            m = linebot.models.LocationSendMessage.new_from_json_dict(msg)
-        if msg["type"] == "sticker":
-            m = linebot.models.StickerSendMessage.new_from_json_dict(msg)
-        if msg["type"] == "image":
-            m = linebot.models.ImageSendMessage.new_from_json_dict(msg)
-        if msg["type"] == "template":
-            m = linebot.models.TemplateSendMessage.new_from_json_dict(msg)
-        if msg["type"] == "text":
-            m = TextSendMessage.new_from_json_dict(msg)
-            print(m)
-                                               
+    # subfunction
+    arg_interface = {}
+    def _add_interface(command, Interface):
+        arg_interface[command] = Interface(default_cfg)
+        arg_interface[command].set_parser(command, subparsers)
 
-        if m:
-            result.append(m)
-    return result
+    # add command interfaces
+    _add_interface("token", TokenInterface)
+    _add_interface("token20", Token20Interface)
+    _add_interface("user", UserInterface)
+    _add_interface("push", PushInterface)
+    _add_interface("insight", PushInterface)
+    _add_interface("audience", PushInterface)
+    _add_interface("richmenu", PushInterface)
+                                   
+    # do parsing
+    args = parser.parse_args()
+
+    if args.command in arg_interface:
+        return arg_interface[args.command].execute(args)
+    parser.print_help()
 
 if __name__ == '__main__':
     main()

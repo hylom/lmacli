@@ -7,6 +7,27 @@ import json
 from .interface import Interface
 
 class Token20Interface(Interface):
+    def set_parser(self, name, subparsers):
+        token = subparsers.add_parser(name)
+        token_subparsers = token.add_subparsers(dest='subcommand')
+        token_create = token_subparsers.add_parser('create')
+        token_verify = token_subparsers.add_parser('verify')
+        token_verify.add_argument('token',
+                                  help="access token")
+        token_revoke = token_subparsers.add_parser('revoke')
+        token_revoke.add_argument('token',
+                                  help="access token")
+
+    def execute(self, args):
+        if args.subcommand == "create":
+            resp = self.create()
+            print(resp)
+            return
+        elif args.subcommand == "revoke":
+            resp = self.revoke(args.token)
+            print(resp)
+            return
+
     def create(self):
         API_URL = "https://api.line.me/v2/oauth/accessToken"
         headers = { "Content-Type": "application/x-www-form-urlencoded" }

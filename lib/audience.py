@@ -7,6 +7,17 @@ import json
 from .interface import Interface
 
 class AudienceInterface(Interface):
+    def set_parser(self, name, subparsers):
+        aud = subparsers.add_parser(name)
+        aud_subparsers = aud.add_subparsers(dest='subcommand')
+        aud_list = aud_subparsers.add_parser('list')
+
+    def execute(self, args):
+        if args.subcommand == "list":
+            resp = self.list()
+            print(resp)
+            return
+
     def create_upload(self,
                       ids,
                       description,
